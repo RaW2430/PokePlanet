@@ -112,7 +112,7 @@ public class EquipmentManager : MonoBehaviour
         
         Vector2 mouseUpPosition = Input.mousePosition;
         float distance = Vector2.Distance(mouseDownPosition, mouseUpPosition);
-        
+
         // 如果鼠标移动距离小于阈值，则认为是点击，否则是拖拽
         if (distance < dragThreshold)
         {
@@ -120,17 +120,26 @@ public class EquipmentManager : MonoBehaviour
             HighlightEquipment(true);
             Invoke("ResetHighlight", 0.2f); // 0.2秒后取消高亮
             GenerateItemsAroundEquipment();
+            // 增加生成计数
+            currentGenerateCount++;
+            
+            // 检查是否达到最大生成数量
+            if (currentGenerateCount >= maxGeneratePerTime)
+            {
+                // 开始冷却
+                StartCoroutine(StartCooldown());
+            }
         }
         else
         {
             Debug.Log("Equipment被拖拽");
-            
+
             // 如果存在GridManager，则将物体吸附到最近的网格
             if (gridManager != null)
             {
                 // 获取当前世界坐标对应的网格坐标
                 Vector2Int newGridPos = gridManager.WorldToGridPosition(transform.position);
-                
+
                 // 检查位置是否有效
                 if (newGridPos.x >= 0 && newGridPos.x < gridManager.gridWidth &&
                     newGridPos.y >= 0 && newGridPos.y < gridManager.gridHeight)
@@ -152,11 +161,11 @@ public class EquipmentManager : MonoBehaviour
 
                     // 更新网格位置
                     gridPosition = newGridPos;
-                    
+
                     // 将物体位置设置到网格中心
                     Vector3 snapPosition = gridManager.GridToWorldPosition(gridPosition.x, gridPosition.y);
                     transform.position = snapPosition;
-                    
+
                     // 将Equipment作为Item注册到GridManager中
                     ItemManager itemManager = GetComponent<ItemManager>();
                     if (itemManager != null)
@@ -256,15 +265,7 @@ public class EquipmentManager : MonoBehaviour
                     // 随机选择一个Prefab生成
                     GameObject randomPrefab = itemToGenerate[Random.Range(0, itemToGenerate.Length)];
                     GenerateItemAtPosition(neighborPos, randomPrefab);
-                    // 增加生成计数
-                    currentGenerateCount++;
                     
-                    // 检查是否达到最大生成数量
-                    if (currentGenerateCount >= maxGeneratePerTime)
-                    {
-                        // 开始冷却
-                        StartCoroutine(StartCooldown());
-                    }
                     return; // 一次点击只生成一个
                 }
             }

@@ -25,7 +25,7 @@ public class OrganizationManager : MonoBehaviour
 
     // 结算面板
     public GameObject scorePanel;
-
+    public TMP_Text scorePanelText;
     // Start is called before the first frame update
     void Start()
     {
@@ -85,8 +85,10 @@ public class OrganizationManager : MonoBehaviour
             scorePanel.SetActive(true);
             if (coins >= coinsNeeded)
             {
+                Debug.Log("You Win!");
                 // 通关
-                scorePanel.transform.GetChild(0).GetComponent<TMP_Text>().text = "You Win! \n New Creature Unlocked!";
+                scorePanelText.text = "You Win! \n New Creature Unlocked!";
+                
                 if (AudioManager.instance != null)
                 {
                     AudioManager.instance.PlayWinSound();
@@ -94,8 +96,9 @@ public class OrganizationManager : MonoBehaviour
             }
             else
             {
+                Debug.Log("Game Over!");
                 // 未通关
-                scorePanel.transform.GetChild(0).GetComponent<TMP_Text>().text = "Game Over";
+                scorePanelText.text = "Game Over!";
                 if (AudioManager.instance != null)
                 {
                     AudioManager.instance.PlayFailSound();
