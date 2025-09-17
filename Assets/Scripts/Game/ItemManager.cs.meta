@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 656c7331eebf5484f948989dafc9000a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - mergeSound: {fileID: 8300000, guid: a7efc9f0043223f469cb8c77b6b7e7b1, type: 3}
+  - audioSource: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
