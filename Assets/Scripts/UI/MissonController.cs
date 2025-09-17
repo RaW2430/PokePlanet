@@ -115,7 +115,7 @@ public class MissonController : MonoBehaviour
         // 更新organization数据，但不给金币奖励
         if (organizationManager != null)
         {
-            organizationManager.organizationNums -= 1;
+            organizationManager.organizationNums = organizationManager.organizationNums == 0 ? 0 : organizationManager.organizationNums - 1 ;
             // 更新文本显示
             organizationManager.UpdateTexts();
             // 激活下一个panel并隐藏当前激活的panel
@@ -224,6 +224,10 @@ public class MissonController : MonoBehaviour
                 if (neededNum == 0)
                 {
                     organizationManager.organizationNums -= 1;
+                    if(organizationManager.organizationNums == 0)
+                    {
+                        isCountingDown = false;
+                    }
                     if (AudioManager.instance != null)
                     {
                         AudioManager.instance.PlayCoinSound();

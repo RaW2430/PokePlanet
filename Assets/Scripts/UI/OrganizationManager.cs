@@ -26,6 +26,8 @@ public class OrganizationManager : MonoBehaviour
     // 结算面板
     public GameObject scorePanel;
     public TMP_Text scorePanelText;
+
+    private bool hasEndLevel = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -80,15 +82,16 @@ public class OrganizationManager : MonoBehaviour
 
     public void UpdateScorePanel()
     {
-        if (organizationNums == 0 && scorePanel != null)
+        if (!hasEndLevel && organizationNums == 0 && scorePanel != null)
         {
             scorePanel.SetActive(true);
+            hasEndLevel = true;
             if (coins >= coinsNeeded)
             {
                 Debug.Log("You Win!");
                 // 通关
                 scorePanelText.text = "You Win! \n New Creature Unlocked!";
-                
+
                 if (AudioManager.instance != null)
                 {
                     AudioManager.instance.PlayWinSound();
@@ -103,7 +106,7 @@ public class OrganizationManager : MonoBehaviour
                 {
                     AudioManager.instance.PlayFailSound();
                 }
-            }   
+            }
         }
     }   
 
