@@ -5,21 +5,62 @@ using UnityEngine.SceneManagement; // 添加场景管理引用
 
 public class UIManager : MonoBehaviour
 {
+    public GameObject menuPanel;
+    public GameObject levelTipsPanel;
+    public GameObject pauseButton;
+    public GameObject resumeButton;
     // Start is called before the first frame update
     void Start()
     {
-        
+        // 初始化提示面板
+        if (levelTipsPanel != null)
+        {
+            levelTipsPanel.SetActive(false);
+        }
     }
 
     void Update()
     {
         // 初始界面点击任意键进入下个场景
-        if (SceneManager.GetActiveScene().buildIndex == 0 && Input.anyKeyDown)
+        // if (SceneManager.GetActiveScene().buildIndex == 0 && Input.anyKeyDown)
+        // {
+        //     LoadNextScene();
+        // }
+    }
+    public void PauseGame()
+    {
+        if (pauseButton != null)
         {
-            LoadNextScene();
+            pauseButton.SetActive(false);
+            Time.timeScale = 0f; // 暂停游戏
+            resumeButton.SetActive(true);
         }
     }
-
+    public void ResumeGame()
+    {
+        if (resumeButton != null)
+        {
+            resumeButton.SetActive(false);
+            Time.timeScale = 1f; // 恢复游戏
+            pauseButton.SetActive(true);
+        }
+    }
+    public void ShowLevelTips()
+    {
+        if (levelTipsPanel != null)
+        {
+            menuPanel.SetActive(false);
+            levelTipsPanel.SetActive(true);
+        }
+    }
+    public void HideLevelTips()
+    {
+        if (levelTipsPanel != null)
+        {
+            levelTipsPanel.SetActive(false);
+            menuPanel.SetActive(true);
+        }
+    }
     // 点击任意键进入下个场景
     public void LoadNextScene()
     {
