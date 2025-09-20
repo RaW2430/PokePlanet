@@ -392,19 +392,21 @@ public class EquipmentManager : MonoBehaviour
     {
         // 获取世界坐标
         Vector3 worldPosition = gridManager.GridToWorldPosition(position.x, position.y);
-        
+
         // 实例化item prefab
         GameObject newItem = Instantiate(itemPrefab, worldPosition, Quaternion.identity);
-        
+
         // 获取新生成的ItemManager组件
         ItemManager newItemManager = newItem.GetComponent<ItemManager>();
         if (newItemManager != null)
         {
             // 在GridManager中注册新item的位置
             gridManager.SetItem(position.x, position.y, newItemManager);
+            newItem.GetComponent<ItemManager>().gridPosition = position;
         }
-        
+
         Debug.Log($"在位置 ({position.x}, {position.y}) 生成item: {itemPrefab.name}");
+        // Debug.Log($"gridManager 生成item: {itemPrefab.name}");
     }
     
     // 随机打乱列表

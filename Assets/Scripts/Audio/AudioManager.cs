@@ -7,7 +7,7 @@ public class AudioManager : MonoBehaviour
     public static AudioManager instance;
     
     private AudioSource audioSource;
-    
+    public AudioClip clickSound;
     // 成功和失败音效的公开引用
     public AudioClip mergeSound;
     public AudioClip failMergeSound;
@@ -35,7 +35,15 @@ public class AudioManager : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
         }
     }
-    
+    public void playClickSound()
+    {
+        if (audioSource != null && clickSound != null)
+        {
+            audioSource.enabled = true;
+            audioSource.PlayOneShot(clickSound);
+        }
+    }
+
     // 播放合并成功音效
     public void PlayMergeSound()
     {

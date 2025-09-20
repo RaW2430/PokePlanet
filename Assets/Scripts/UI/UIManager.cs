@@ -1,22 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement; // 添加场景管理引用
-
+using UnityEngine.SceneManagement; 
+using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
+    public static UIManager instance; // 添加单例引用
+    public GameObject UICanvasObj;
+    public GameObject[] allPanels;
     public GameObject menuPanel;
     public GameObject levelTipsPanel;
+    public GameObject encyclopediaPanel;
+    public GameObject zhuHuanEncPanel;
+    public GameObject baiXianEncPanel;
     public GameObject pauseButton;
     public GameObject resumeButton;
+
+    public bool isBaiXianEncUnlocked = false;
+    public GameObject isBaiXianEncLockIcon;
+    
+    public bool isZhuHuanEncUnlocked = false;
+    public GameObject isZhuHuanEncLockIcon;
+
+    void Awake()
+    {
+        // 实现单例模式
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
     // Start is called before the first frame update
     void Start()
     {
-        // 初始化提示面板
-        if (levelTipsPanel != null)
+        if (menuPanel != null)
         {
-            levelTipsPanel.SetActive(false);
+            hideAllPanel();
+            menuPanel.SetActive(true);
         }
+        Time.timeScale = 1f; // 确保游戏开始时未暂停
     }
 
     void Update()
@@ -27,6 +54,49 @@ public class UIManager : MonoBehaviour
         //     LoadNextScene();
         // }
     }
+
+    public void hideAllPanel()
+    {
+        foreach (GameObject panel in allPanels)
+        {
+            if (panel != null)
+            {
+                panel.SetActive(false);
+            }
+        }
+    }
+    public void ShowZhuHuanEnc()
+    {
+        if (zhuHuanEncPanel != null && isZhuHuanEncUnlocked)
+        {
+            hideAllPanel();
+            zhuHuanEncPanel.SetActive(true);
+        }
+    }
+    public void ShowBaiXianEnc()
+    {
+        if (baiXianEncPanel != null && isBaiXianEncUnlocked)
+        {
+            hideAllPanel();
+            baiXianEncPanel.SetActive(true);
+        }
+    }
+    // public void UnlockZhuHuanEnc()
+    // {
+    //     isZhuHuanEncUnlocked = true;
+    //     if (isZhuHuanEncLockIcon != null)
+    //     {
+    //         isZhuHuanEncLockIcon.SetActive(false);
+    //     }
+    // }
+    // public void UnlockBaiXianEnc()
+    // {
+    //     isBaiXianEncUnlocked = true;
+    //     if (isBaiXianEncLockIcon != null)
+    //     {
+    //         isBaiXianEncLockIcon.SetActive(false);
+    //     }
+    // }
     public void PauseGame()
     {
         if (pauseButton != null)
@@ -45,11 +115,27 @@ public class UIManager : MonoBehaviour
             pauseButton.SetActive(true);
         }
     }
+    public void ShowMenu()
+    {
+        hideAllPanel();
+        if (menuPanel != null)
+        {
+            menuPanel.SetActive(true);
+        }
+    }   
+    public void ShowEncyclopedia()
+    {
+        hideAllPanel();
+        if (encyclopediaPanel != null)
+        {
+            encyclopediaPanel.SetActive(true);
+        }
+    }
     public void ShowLevelTips()
     {
         if (levelTipsPanel != null)
         {
-            menuPanel.SetActive(false);
+            hideAllPanel();
             levelTipsPanel.SetActive(true);
         }
     }
@@ -57,7 +143,7 @@ public class UIManager : MonoBehaviour
     {
         if (levelTipsPanel != null)
         {
-            levelTipsPanel.SetActive(false);
+            hideAllPanel();
             menuPanel.SetActive(true);
         }
     }
@@ -66,8 +152,11 @@ public class UIManager : MonoBehaviour
     {
         // 获取当前场景索引
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        // 加载下一个场景（循环到第一个场景）
+        
+        // 加载下一个场景
         SceneManager.LoadScene((currentSceneIndex + 1) % SceneManager.sceneCountInBuildSettings);
+        
+        UICanvasObj.SetActive(false);
     }
 
     // 点击按钮加载指定场景
@@ -76,8 +165,10 @@ public class UIManager : MonoBehaviour
         // 检查场景名称是否为空
         if (!string.IsNullOrEmpty(sceneName))
         {
-            // 加载指定名称的场景
-            SceneManager.LoadScene(sceneName);
+            // 使用 SceneLoader 跳转到 LoadingScene，并传递目标场景名
+            SceneLoader.LoadWithLoadingScene(sceneName);
+
+            UICanvasObj.SetActive(false);
         }
         else
         {

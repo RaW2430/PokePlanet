@@ -106,7 +106,7 @@ public class MissonController : MonoBehaviour
     // 倒计时结束的处理方法
     private void OnCountdownFinished()
     {
-        Debug.Log("倒计时结束");
+        // Debug.Log("倒计时结束");
         if (organizationManager.organizationNums == 1 && organizationManager.coins < organizationManager.coinsNeeded && AudioManager.instance != null)
         {
             AudioManager.instance.PlayFailSound();
@@ -123,7 +123,7 @@ public class MissonController : MonoBehaviour
             {
                 organizationManager.ActivateNextPanel();
             }
-            Debug.Log($"倒计时结束，已更新OrganizationManager的值：organizationNums = {organizationManager.organizationNums}");
+            // Debug.Log($"倒计时结束，已更新OrganizationManager的值：organizationNums = {organizationManager.organizationNums}");
         }
     }
     // 添加开始倒计时的方法
@@ -133,7 +133,7 @@ public class MissonController : MonoBehaviour
         {
             isCountingDown = true;
             countdownTimer = countdownTime;
-            Debug.Log("开始倒计时");
+            // Debug.Log("开始倒计时");
         }
     }
     // 按钮点击事件处理函数

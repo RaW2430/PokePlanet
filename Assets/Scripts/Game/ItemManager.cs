@@ -117,6 +117,9 @@ public class ItemManager : MonoBehaviour
                 // 如果超出网格范围，返回原始位置
                 transform.position = gridManager.GridToWorldPosition(gridPosition.x, gridPosition.y);
                 PlayFailMergeSound();
+                
+                // 确保原位置正确注册
+                gridManager.SetItem(gridPosition.x, gridPosition.y, this);
                 return;
             }
 
@@ -137,6 +140,9 @@ public class ItemManager : MonoBehaviour
                             // 执行合并逻辑
                             MergeWith(existingItem);
                             PlayMergeSound();
+                            
+                            // 合并后直接返回，避免后续的位置处理
+                            return;
                         }
                         else
                         {
@@ -145,7 +151,6 @@ public class ItemManager : MonoBehaviour
                             // 播放合并失败音效
                             PlayFailMergeSound();
                         }
-                        // 无论是否合并，都需要更新位置
                     }
                     else
                     {
@@ -155,16 +160,12 @@ public class ItemManager : MonoBehaviour
                     }
                 }
 
-                // 如果新位置与原位置不同，需要清除原位置的注册信息
-                if (newGridPos.x != gridPosition.x || newGridPos.y != gridPosition.y)
-                {
-                    // 清除原来位置的注册信息
-                    gridManager.ClearItem(gridPosition.x, gridPosition.y);
-                }
+                // 无论何种情况，先清除原位置的注册信息
+                gridManager.ClearItem(gridPosition.x, gridPosition.y);
 
                 // 更新网格位置
                 gridPosition = newGridPos;
-
+                Debug.Log($"Item {itemData.id} 拖动结束: 原位置({previousGridPosition.x}, {previousGridPosition.y}) -> 新位置({gridPosition.x}, {gridPosition.y})");
                 // 将物体位置设置到网格中心
                 Vector3 snapPosition = gridManager.GridToWorldPosition(gridPosition.x, gridPosition.y);
                 transform.position = snapPosition;
@@ -173,7 +174,7 @@ public class ItemManager : MonoBehaviour
                 gridManager.SetItem(gridPosition.x, gridPosition.y, this);
 
                 // 输出GridManager中所有已存在的item信息
-                gridManager.LogAllItems();
+                // gridManager.LogAllItems();
 
                 // 输出四个方向网格中item的class属性
                 LogSurroundingItems(gridPosition);

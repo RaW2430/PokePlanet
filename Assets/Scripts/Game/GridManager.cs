@@ -18,7 +18,7 @@ public class GridManager : MonoBehaviour
     [Header("Texture Settings")]
     public Texture2D backgroundTexture;
     public Texture2D cellTexture;
-    public Texture2D borderTexture; 
+    public Texture2D borderTexture;
     public Texture2D blockTexture;
     public Texture2D[] creaturesTextures;
     public bool useTextures = false;
@@ -31,11 +31,14 @@ public class GridManager : MonoBehaviour
     private SpriteRenderer borderRenderer; // 新增：外围渲染器
     private GameObject gridContainer;
     private Dictionary<Vector2Int, GameObject> gridCells;
-    
+
     // 添加二维数组来记录每个位置的item信息
     private ItemManager[,] itemGrid;
 
-    
+    [Header("Gizmos Settings")]
+    public float gizmosDistanceBelow = 2f; // 在原网格下方的距离
+    public Color registeredCellColor = Color.red; // 已注册单元格的颜色
+    public Color unregisteredCellColor = Color.white; // 未注册单元格的颜色
 
     void Start()
     {
@@ -51,7 +54,7 @@ public class GridManager : MonoBehaviour
         gridContainer.transform.position = gamePosition;
 
         gridCells = new Dictionary<Vector2Int, GameObject>();
-        
+
         // 初始化itemGrid二维数组
         itemGrid = new ItemManager[gridWidth, gridHeight];
 
@@ -85,7 +88,7 @@ public class GridManager : MonoBehaviour
                     // 基于坐标生成伪随机数，确保相同位置总是得到相同的结果
                     int seed = x * 1000 + y;
                     System.Random random = new System.Random(seed);
-                    
+
                     // 使用伪随机数决定是否生成block（例如50%概率）
                     if (random.NextDouble() > 0.5)
                     {
@@ -123,11 +126,11 @@ public class GridManager : MonoBehaviour
             GameObject creatureObject = new GameObject("CreatureTexture");
             creatureObject.transform.SetParent(block.transform);
             creatureObject.transform.localPosition = Vector3.zero; // 与父对象在同一位置
-            
+
             SpriteRenderer creatureRenderer = creatureObject.AddComponent<SpriteRenderer>();
             creatureRenderer.sortingOrder = 1; // 确保渲染顺序正确
             creatureRenderer.drawMode = SpriteDrawMode.Sliced; // 允许调整大小
-            
+
             creatureRenderer.sprite = CreateSpriteFromTexture(selectedCreatureTexture);
             // 设置贴图大小以完全覆盖cell
             creatureRenderer.size = new Vector2(cellSize, cellSize);
@@ -139,11 +142,11 @@ public class GridManager : MonoBehaviour
             GameObject blockObject = new GameObject("BlockTexture");
             blockObject.transform.SetParent(block.transform);
             blockObject.transform.localPosition = Vector3.zero; // 与父对象在同一位置
-            
+
             SpriteRenderer blockRenderer = blockObject.AddComponent<SpriteRenderer>();
             blockRenderer.sortingOrder = 2; // 确保渲染顺序正确，显示在creatureTexture之上
             blockRenderer.drawMode = SpriteDrawMode.Sliced; // 允许调整大小
-            
+
             blockRenderer.sprite = CreateSpriteFromTexture(blockTexture);
             // 设置贴图大小以完全覆盖cell
             blockRenderer.size = new Vector2(cellSize, cellSize);
@@ -154,15 +157,15 @@ public class GridManager : MonoBehaviour
             Texture2D blockTexture2D = new Texture2D(1, 1);
             blockTexture2D.SetPixel(0, 0, new Color(0.7f, 0.7f, 0.9f, 1f)); // 默认淡蓝色
             blockTexture2D.Apply();
-            
+
             GameObject blockObject = new GameObject("DefaultBlockTexture");
             blockObject.transform.SetParent(block.transform);
             blockObject.transform.localPosition = Vector3.zero; // 与父对象在同一位置
-            
+
             SpriteRenderer blockRenderer = blockObject.AddComponent<SpriteRenderer>();
             blockRenderer.sortingOrder = 2; // 确保渲染顺序正确
             blockRenderer.drawMode = SpriteDrawMode.Sliced; // 允许调整大小
-            
+
             blockRenderer.sprite = CreateSpriteFromTexture(blockTexture2D);
             // 设置贴图大小以完全覆盖cell
             blockRenderer.size = new Vector2(cellSize, cellSize);
@@ -254,7 +257,7 @@ public class GridManager : MonoBehaviour
             gridOffset.y + (gridHeight * cellSize) / 2f,
             0.05f // 在背景和格子之间
         );
-        
+
         // 添加SpriteRenderer组件
         borderRenderer = borderObject.AddComponent<SpriteRenderer>();
         borderRenderer.sortingOrder = -1; // 确保在外围，但比格子低一层
@@ -279,8 +282,8 @@ public class GridManager : MonoBehaviour
         //     borderTexture2D.Apply();
         //     borderRenderer.sprite = CreateSpriteFromTexture(borderTexture2D);
         // }
-        
-        
+
+
     }
     void DrawGridLines()
     {
@@ -385,7 +388,7 @@ public class GridManager : MonoBehaviour
         {
             itemGrid[x, y] = item;
             // 每次设置item后输出所有已存在的item属性
-            LogAllItems();
+            // LogAllItems();
         }
     }
 
@@ -406,7 +409,7 @@ public class GridManager : MonoBehaviour
         {
             itemGrid[x, y] = null;
             // 每次清除item后输出所有已存在的item属性
-            LogAllItems();
+            // LogAllItems();
         }
     }
 
@@ -415,7 +418,7 @@ public class GridManager : MonoBehaviour
     {
         Debug.Log("=== 网格中所有物品信息 ===");
         bool hasItems = false;
-        
+
         for (int x = 0; x < gridWidth; x++)
         {
             for (int y = 0; y < gridHeight; y++)
@@ -428,7 +431,7 @@ public class GridManager : MonoBehaviour
                 }
             }
         }
-        
+
         if (!hasItems)
         {
             Debug.Log("  网格中暂无物品");
@@ -454,10 +457,10 @@ public class GridManager : MonoBehaviour
 
         // 获取世界坐标
         Vector3 worldPosition = GridToWorldPosition(position.x, position.y);
-        
+
         // 实例化prefab
         GameObject itemObject = Instantiate(prefab, worldPosition, Quaternion.identity);
-        
+
         // 获取ItemManager组件
         ItemManager itemManager = itemObject.GetComponent<ItemManager>();
         if (itemManager != null)
@@ -492,6 +495,15 @@ public class GridManager : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        // 先绘制棋盘网格
+        DrawGridGizmos();
+        
+        // 再绘制下方的已注册单元格棋盘
+        DrawRegisteredCellsGizmos();
+    }
+    
+    void DrawGridGizmos()
+    {
         // 在Scene视图中显示网格轮廓
         Gizmos.color = gridLineColor;
         
@@ -510,6 +522,66 @@ public class GridManager : MonoBehaviour
             float xPos = gamePosition.x + gridOffset.x + x * cellSize;
             Vector3 start = new Vector3(xPos, gamePosition.y + gridOffset.y, 0f);
             Vector3 end = new Vector3(xPos, gamePosition.y + gridOffset.y + gridHeight * cellSize, 0f);
+            Gizmos.DrawLine(start, end);
+        }
+    }
+    
+    void DrawRegisteredCellsGizmos()
+    {
+        // 检查itemGrid是否已初始化
+        if (itemGrid == null) return;
+        
+        // 计算下方网格的位置
+        Vector3 offsetPosition = gamePosition;
+        offsetPosition.y -= gizmosDistanceBelow;
+        
+        // 先绘制下方的完整棋盘网格
+        DrawGridGizmosAtPosition(offsetPosition);
+        
+        // 再在下方棋盘中标识已注册和未注册的单元格
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                // 计算单元格中心位置
+                Vector3 cellCenter = new Vector3(
+                    offsetPosition.x + gridOffset.x + x * cellSize + cellSize / 2f,
+                    offsetPosition.y + gridOffset.y + y * cellSize + cellSize / 2f,
+                    0f
+                );
+                
+                // 根据是否注册设置不同的颜色和绘制方式
+                if (itemGrid[x, y] != null)
+                {
+                    // 已注册的单元格用红色填充
+                    Gizmos.color = registeredCellColor;
+                    Gizmos.DrawCube(cellCenter, new Vector3(cellSize * 0.8f, cellSize * 0.8f, 0.1f));
+                }
+                // 未注册的单元格不需要特别绘制，因为已经有网格线了
+            }
+        }
+    }
+    
+    void DrawGridGizmosAtPosition(Vector3 position)
+    {
+        // 在指定位置绘制网格
+        Gizmos.color = gridLineColor;
+        
+        // 绘制水平线
+        for (int y = 0; y <= gridHeight; y++)
+        {
+            float yPos = position.y + gridOffset.y + y * cellSize;
+            Vector3 start = new Vector3(position.x + gridOffset.x, yPos, 0f);
+            Vector3 end = new Vector3(position.x + gridOffset.x + gridWidth * cellSize, yPos, 0f);
+            Gizmos.DrawLine(start, end);
+        }
+
+        // 绘制垂直线
+        for (int x = 0; x <= gridWidth; x++)
+        {
+            float xPos = position.x + gridOffset.x + x * cellSize;
+            Vector3 start = new Vector3(xPos, position.y + gridOffset.y, 0f);
+            Vector3 end = new Vector3(xPos, position.y + gridOffset.y + gridHeight * cellSize, 0f);
             Gizmos.DrawLine(start, end);
         }
     }

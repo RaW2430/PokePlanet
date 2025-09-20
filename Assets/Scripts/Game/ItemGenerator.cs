@@ -72,7 +72,7 @@ public class ItemGenerator : MonoBehaviour
             newItemManager.gridPosition = new Vector2Int(x, y);
             gridManager.SetItem(x, y, newItemManager);   
         }
-        gridManager.LogAllItems();
+        // gridManager.LogAllItems();
         Debug.Log($"在网格位置 ({x}, {y}) 成功生成item: {itemPrefab.name}");
     }
 

@@ -26,7 +26,8 @@ public class OrganizationManager : MonoBehaviour
     // 结算面板
     public GameObject scorePanel;
     public TMP_Text scorePanelText;
-
+    public GameObject scorePanelText2;
+    public GameObject rewardBtn;
     private bool hasEndLevel = false;
     // Start is called before the first frame update
     void Start()
@@ -90,8 +91,21 @@ public class OrganizationManager : MonoBehaviour
             {
                 Debug.Log("You Win!");
                 // 通关
-                scorePanelText.text = "You Win! \n New Creature Unlocked!";
+                // scorePanelText.text = "You Win!";
+                if(rewardBtn != null)
+                    rewardBtn.SetActive(true);
+                // 解锁Encyclopedia条目
+                if (UIManager.instance != null)
+                {
+                    UIManager.instance.isBaiXianEncUnlocked = true;
+                    UIManager.instance.isZhuHuanEncUnlocked = true;
 
+                    // 隐藏锁定图标
+                    if (UIManager.instance.isBaiXianEncLockIcon != null)
+                        UIManager.instance.isBaiXianEncLockIcon.SetActive(false);
+                    if (UIManager.instance.isZhuHuanEncLockIcon != null)
+                        UIManager.instance.isZhuHuanEncLockIcon.SetActive(false);
+                }
                 if (AudioManager.instance != null)
                 {
                     AudioManager.instance.PlayWinSound();
@@ -102,6 +116,7 @@ public class OrganizationManager : MonoBehaviour
                 Debug.Log("Game Over!");
                 // 未通关
                 scorePanelText.text = "Game Over!";
+                scorePanelText2.SetActive(false);
                 if (AudioManager.instance != null)
                 {
                     AudioManager.instance.PlayFailSound();
