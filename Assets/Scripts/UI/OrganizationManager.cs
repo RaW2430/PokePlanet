@@ -92,7 +92,8 @@ public class OrganizationManager : MonoBehaviour
                 Debug.Log("You Win!");
                 // 通关
                 // scorePanelText.text = "You Win!";
-                if(rewardBtn != null)
+                scorePanelText2.SetActive(true);
+                if (rewardBtn != null)
                     rewardBtn.SetActive(true);
                 // 解锁Encyclopedia条目
                 if (UIManager.instance != null)
